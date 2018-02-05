@@ -7,10 +7,17 @@
   
   const p_verifyUniforms = uniforms => {
     for(let uniform in uniforms) {
-      if(typeof uniforms[uniform] !== 'number') {
-        throw new TypeError(`${uniform} mut be a Number`);
+      if(typeof +uniforms[uniform] !== 'number') {
+        throw new TypeError(`${uniform} must be a Number`);
       }
     }
+  }
+
+  // TODO: this function must be improved
+  const validateConfig = config => {
+    if(!config) throw new Error('You should specify a config object');
+    if(config.canvas.nodeName !== "CANVAS") throw new Error('config.canvas must be a Canvas element');
+    p_verifyUniforms(config.uniforms);
   }
 
   //default vertex shader
@@ -67,23 +74,20 @@
     }
   }
 
-  const addFragmentShaders = newFragShader => {
-    if(newFragShader.type && newFragShader.text) {
-      fragmentShaders[newFragShader.name] = newFragShader;
-    } else {
-      throw Error('Error adding shaders');
-    }
-    
-  }
+
   // modified from WebGl Fundamentals boilerplate to fit our needs
   // https://webglfundamentals.org/webgl/lessons/webgl-image-processing.html
   const render = (shaderName, config) => {
+    // some tests
+    validateConfig(config);
+    if(!fragmentShaders[shaderName]) throw new Error(shaderName + ' is not defined in shaderfy-core.js');
+
     // Get A WebGL context
     /** @type {HTMLCanvasElement} */
     var canvas = config.canvas;
     var image = config.image;
     var fragShader = fragmentShaders[shaderName];
-  
+    
     var gl = canvas.getContext("webgl");
   
     if(config.fitCanvas){
@@ -95,7 +99,7 @@
     gl.getContextAttributes().preserveDrawingBuffer = true;
   
     if (!gl) {
-      return; // TODO: proper notification
+      return void window.alert('WebGL is not available on your machine');
     }
    
     // setup GLSL program    
@@ -141,11 +145,6 @@
     // lookup uniforms
     var resolutionLocation = gl.getUniformLocation(program, "u_resolution");
     var textureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
-    // !
-  
-  
-    // var pixel_h = gl.getUniformLocation(program, "pixel_h");
-    // var pixel_w = gl.getUniformLocation(program, "pixel_w");
   
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
   
@@ -204,7 +203,6 @@
     var count = 6;
     gl.drawArrays(primitiveType, offset, count);
     
-    //setDownloadLink('saveLink', canvas.toDataURL('image/png'));
   }
   
   function setRectangle(gl, x, y, width, height) {
@@ -227,11 +225,4 @@
     render
   }
 
-
 }));
-
-function setDownloadLink(linkId, image, filename) {
-  let link = document.getElementById(linkId);
-  link.href = image;
-  link.donwload = filename;
-}
