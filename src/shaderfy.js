@@ -1,9 +1,8 @@
-(function (root, factory) {
+;(function (root, factory) {
   if (!root.shaderfy) {
     root.shaderfy = factory.call(root)
   }
 }(window, function () {
-
   const verifyUniforms = uniforms => {
     for (let uniform in uniforms) {
       if (typeof +uniforms[uniform] !== 'number') {
@@ -48,8 +47,60 @@
     `
   }
 
+  // shader from WebGL Fundamentals
+  // https://webglfundamentals.org/webgl/lessons/webgl-image-processing.html
+  const convolutionKernerlFragShader = `precision mediump float;      
+  // our texture
+  uniform sampler2D u_image;
+  uniform vec2 u_textureSize;
+  uniform float u_kernel[9];
+  uniform float u_kernelWeight;
+  
+  // the texCoords passed in from the vertex shader.
+  varying vec2 v_texCoord;
+  
+  void main() {
+    vec2 onePixel = vec2(1.0, 1.0) / u_textureSize;
+    vec4 colorSum =
+      texture2D(u_image, v_texCoord + onePixel * vec2(-1, -1)) * u_kernel[0] +
+      texture2D(u_image, v_texCoord + onePixel * vec2( 0, -1)) * u_kernel[1] +
+      texture2D(u_image, v_texCoord + onePixel * vec2( 1, -1)) * u_kernel[2] +
+      texture2D(u_image, v_texCoord + onePixel * vec2(-1,  0)) * u_kernel[3] +
+      texture2D(u_image, v_texCoord + onePixel * vec2( 0,  0)) * u_kernel[4] +
+      texture2D(u_image, v_texCoord + onePixel * vec2( 1,  0)) * u_kernel[5] +
+      texture2D(u_image, v_texCoord + onePixel * vec2(-1,  1)) * u_kernel[6] +
+      texture2D(u_image, v_texCoord + onePixel * vec2( 0,  1)) * u_kernel[7] +
+      texture2D(u_image, v_texCoord + onePixel * vec2( 1,  1)) * u_kernel[8] ;
+  
+    // Divide the sum by the weight but just use rgb
+    // we'll set alpha to 1.0
+    gl_FragColor = vec4((colorSum / u_kernelWeight).rgb, 1.0);
+  }
+  `
+
   // here are the image processing fragment shaders
   const fragmentShaders = {
+    normal: {
+      name: 'normal',
+      type: 'x-shader/x-fragment',
+      defaultUniforms: {},
+      text: `
+      precision mediump float;
+ 
+      // our texture
+      uniform sampler2D u_image;
+      
+      // the texCoords passed in from the vertex shader.
+      varying vec2 v_texCoord;
+      
+      void main() {
+        // Look up a color from the texture.
+        gl_FragColor = texture2D(u_image, v_texCoord);
+      }
+      `
+    },
+    // based on Agnius Vasiliauskas's original work
+    // http://coding-experiments.blogspot.com.br/2010/06/pixelation.html
     pixelation: {
       name: 'pixelation',
       type: 'x-shader/x-fragment',
@@ -75,27 +126,30 @@
         gl_FragColor = texture2D(u_image, coord);
       }`
     },
+    // edge detect 1
+    edgeDetect1: {
+      name: 'edgeDetect1',
+      type: 'x-shader/x-fragment',
+      defaultUniforms: {
+        u_kernel: [
+          -5, 0, 0,
+          0, 0, 0,
+          0, 0, 5
+        ],
+        u_kernelWeight: 1
+      },
+      text: convolutionKernerlFragShader
+
+    },
+     // edit for new shader
     anotherShader: {
       name: 'anotherShader',
       type: 'x-shader/x-fragment',
       defaultUniforms: {
-        uniformX: 999
+        uniformX: 1.0
       },
-      text: ` 
-        precision mediump float;
-
-        uniform sampler2D u_image;
-        uniform float uniformX;
-
-        varying vec2 v_texCoord;        
-        
-        void main() {
-          vec2 coord = vec2(v_texCoord.x, v_texCoord.y);
-          gl_FragColor = texture2D(u_image, coord);
-        }
-      `
+      text: ` `
     }
-
   }
 
   // modified from WebGl Fundamentals boilerplate to fit our needs
@@ -217,8 +271,12 @@
     gl.uniform2f(textureSizeLocation, image.width, image.height)
 
     // always using float type for uniforms, maybe expand to test integer etc
-    for (let uniform in config.uniforms) {
-      gl.uniform1f(gl.getUniformLocation(program, uniform), config.uniforms[uniform])
+    for (var u in config.uniforms) {
+      if (config.uniforms[u].constructor === Array) {
+        gl.uniform1fv(gl.getUniformLocation(program, u + '[0]'), config.uniforms[u])
+      } else {
+        gl.uniform1f(gl.getUniformLocation(program, u), config.uniforms[u])
+      }
     }
 
     // Draw the rectangle.
@@ -245,7 +303,8 @@
   }
 
   return {
-    render
+    render,
+    fragmentShaders
   }
 }))
 
@@ -280,7 +339,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-(function(root, factory) {  // eslint-disable-line
+;(function(root, factory) {  // eslint-disable-line
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define([], function () {
