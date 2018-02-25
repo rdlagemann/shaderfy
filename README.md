@@ -1,2 +1,2 @@
 # shaderfy
-[WIP] Cliente-side image processing with WebGL shaders
+[WIP] Client-side image processing with WebGL shaders
