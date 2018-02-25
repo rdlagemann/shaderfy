@@ -1,6 +1,3 @@
-var shaderfy = (function () {
-'use strict';
-
 /*
 * Copyright 2012, Gregg Tavares.
 * All rights reserved.
@@ -32,12 +29,15 @@ var shaderfy = (function () {
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-var topWindow = window;
+
+'use strict'
+
+var topWindow = window
 
 /** @module webgl-utils */
 
 function isInIFrame (w) {
-  w = w || topWindow;
+  w = w || topWindow
   return w !== w.top
 }
 
@@ -53,9 +53,9 @@ if (!isInIFrame()) {
 function error (msg) {
   if (topWindow.console) {
     if (topWindow.console.error) {
-      topWindow.console.error(msg);
+      topWindow.console.error(msg)
     } else if (topWindow.console.log) {
-      topWindow.console.log(msg);
+      topWindow.console.log(msg)
     }
   }
 }
@@ -76,23 +76,23 @@ function error (msg) {
  * @return {WebGLShader} The created shader.
  */
 function loadShader (gl, shaderSource, shaderType, opt_errorCallback) {
-  var errFn = opt_errorCallback || error;
+  var errFn = opt_errorCallback || error
   // Create the shader object
-  var shader = gl.createShader(shaderType);
+  var shader = gl.createShader(shaderType)
 
   // Load the shader source
-  gl.shaderSource(shader, shaderSource);
+  gl.shaderSource(shader, shaderSource)
 
   // Compile the shader
-  gl.compileShader(shader);
+  gl.compileShader(shader)
 
   // Check the compile status
-  var compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+  var compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
   if (!compiled) {
     // Something went wrong during compilation; get the error
-    var lastError = gl.getShaderInfoLog(shader);
-    errFn("*** Error compiling shader '" + shader + "':" + lastError);
-    gl.deleteShader(shader);
+    var lastError = gl.getShaderInfoLog(shader)
+    errFn("*** Error compiling shader '" + shader + "':" + lastError)
+    gl.deleteShader(shader)
     return null
   }
 
@@ -111,29 +111,29 @@ function loadShader (gl, shaderSource, shaderType, opt_errorCallback) {
  */
 function createProgram (
     gl, shaders, opt_attribs, opt_locations, opt_errorCallback) {
-  var errFn = opt_errorCallback || error;
-  var program = gl.createProgram();
+  var errFn = opt_errorCallback || error
+  var program = gl.createProgram()
   shaders.forEach(function (shader) {
-    gl.attachShader(program, shader);
-  });
+    gl.attachShader(program, shader)
+  })
   if (opt_attribs) {
     opt_attribs.forEach(function (attrib, ndx) {
       gl.bindAttribLocation(
           program,
           opt_locations ? opt_locations[ndx] : ndx,
-          attrib);
-    });
+          attrib)
+    })
   }
-  gl.linkProgram(program);
+  gl.linkProgram(program)
 
   // Check the link status
-  var linked = gl.getProgramParameter(program, gl.LINK_STATUS);
+  var linked = gl.getProgramParameter(program, gl.LINK_STATUS)
   if (!linked) {
       // something went wrong with the link
-    var lastError = gl.getProgramInfoLog(program);
-    errFn('Error in program linking:' + lastError);
+    var lastError = gl.getProgramInfoLog(program)
+    errFn('Error in program linking:' + lastError)
 
-    gl.deleteProgram(program);
+    gl.deleteProgram(program)
     return null
   }
   return program
@@ -149,19 +149,19 @@ function createProgram (
  * @return {WebGLShader} The created shader.
  */
 function createShaderFromScript (gl, scriptId, opt_shaderType, opt_errorCallback) {
-  var shaderSource = '';
-  var shaderType;
-  var shaderScript = document.getElementById(scriptId);
+  var shaderSource = ''
+  var shaderType
+  var shaderScript = document.getElementById(scriptId)
   if (!shaderScript) {
     throw ('*** Error: unknown script element' + scriptId)
   }
-  shaderSource = shaderScript.text;
+  shaderSource = shaderScript.text
 
   if (!opt_shaderType) {
     if (shaderScript.type === 'x-shader/x-vertex') {
-      shaderType = gl.VERTEX_SHADER;
+      shaderType = gl.VERTEX_SHADER
     } else if (shaderScript.type === 'x-shader/x-fragment') {
-      shaderType = gl.FRAGMENT_SHADER;
+      shaderType = gl.FRAGMENT_SHADER
     } else if (shaderType !== gl.VERTEX_SHADER && shaderType !== gl.FRAGMENT_SHADER) {
       throw ('*** Error: unknown shader type')
     }
@@ -173,21 +173,21 @@ function createShaderFromScript (gl, scriptId, opt_shaderType, opt_errorCallback
 }
 
 function createShaderFromObjects (gl, shaderObject, opt_shaderType, opt_errorCallback) {
-  var shaderSource = '';
-  var shaderType;
-  var shaderScript = shaderObject;
+  var shaderSource = ''
+  var shaderType
+  var shaderScript = shaderObject
   if (!shaderScript) {
     throw ('*** Error: unknown script element' + shaderObject)
   }
-  shaderSource = shaderScript.text;
+  shaderSource = shaderScript.text
 
   if (!opt_shaderType) {
     if (shaderScript.type === 'x-shader/x-vertex') {
-      shaderType = gl.VERTEX_SHADER;
+      shaderType = gl.VERTEX_SHADER
     } else if (shaderScript.type === 'x-shader/x-fragment') {
-      shaderType = gl.FRAGMENT_SHADER;
+      shaderType = gl.FRAGMENT_SHADER
     } else if (shaderType !== gl.VERTEX_SHADER && shaderType !== gl.FRAGMENT_SHADER) {
-      console.log(shaderObject);
+      console.log(shaderObject)
       throw ('*** Error: unknown shader type')
     }
   }
@@ -200,7 +200,7 @@ function createShaderFromObjects (gl, shaderObject, opt_shaderType, opt_errorCal
 var defaultShaderType = [
   'VERTEX_SHADER',
   'FRAGMENT_SHADER'
-];
+]
 
 /**
  * Creates a program from 2 script tags.
@@ -218,19 +218,19 @@ var defaultShaderType = [
  * @memberOf module:webgl-utils
  */
 function createProgramFromScripts (gl, shaderScriptIds, opt_attribs, opt_locations, opt_errorCallback) {
-  var shaders = [];
+  var shaders = []
   for (var ii = 0; ii < shaderScriptIds.length; ++ii) {
     shaders.push(createShaderFromScript(
-        gl, shaderScriptIds[ii], gl[defaultShaderType[ii]], opt_errorCallback));
+        gl, shaderScriptIds[ii], gl[defaultShaderType[ii]], opt_errorCallback))
   }
   return createProgram(gl, shaders, opt_attribs, opt_locations, opt_errorCallback)
 }
 
 function createProgramFromObjects (gl, shaderScriptIds, opt_attribs, opt_locations, opt_errorCallback) {
-  var shaders = [];
+  var shaders = []
   for (var ii = 0; ii < shaderScriptIds.length; ++ii) {
     shaders.push(createShaderFromObjects(
-        gl, shaderScriptIds[ii], gl[defaultShaderType[ii]], opt_errorCallback));
+        gl, shaderScriptIds[ii], gl[defaultShaderType[ii]], opt_errorCallback))
   }
   return createProgram(gl, shaders, opt_attribs, opt_locations, opt_errorCallback)
 }
@@ -252,10 +252,10 @@ function createProgramFromObjects (gl, shaderScriptIds, opt_attribs, opt_locatio
  */
 function createProgramFromSources (
     gl, shaderSources, opt_attribs, opt_locations, opt_errorCallback) {
-  var shaders = [];
+  var shaders = []
   for (var ii = 0; ii < shaderSources.length; ++ii) {
     shaders.push(loadShader(
-        gl, shaderSources[ii], gl[defaultShaderType[ii]], opt_errorCallback));
+        gl, shaderSources[ii], gl[defaultShaderType[ii]], opt_errorCallback))
   }
   return createProgram(gl, shaders, opt_attribs, opt_locations, opt_errorCallback)
 }
@@ -284,7 +284,7 @@ function getBindPointForSamplerType (gl, type) {
  * @memberOf module:webgl-utils
  */
 function createUniformSetters (gl, program) {
-  var textureUnit = 0;
+  var textureUnit = 0
 
   /**
    * Creates a setter for a uniform of the given program with it's
@@ -294,137 +294,137 @@ function createUniformSetters (gl, program) {
    * @returns {function} the created setter.
    */
   function createUniformSetter (program, uniformInfo) {
-    var location = gl.getUniformLocation(program, uniformInfo.name);
-    var type = uniformInfo.type;
+    var location = gl.getUniformLocation(program, uniformInfo.name)
+    var type = uniformInfo.type
     // Check if this uniform is an array
-    var isArray = (uniformInfo.size > 1 && uniformInfo.name.substr(-3) === '[0]');
+    var isArray = (uniformInfo.size > 1 && uniformInfo.name.substr(-3) === '[0]')
     if (type === gl.FLOAT && isArray) {
       return function (v) {
-        gl.uniform1fv(location, v);
+        gl.uniform1fv(location, v)
       }
     }
     if (type === gl.FLOAT) {
       return function (v) {
-        gl.uniform1f(location, v);
+        gl.uniform1f(location, v)
       }
     }
     if (type === gl.FLOAT_VEC2) {
       return function (v) {
-        gl.uniform2fv(location, v);
+        gl.uniform2fv(location, v)
       }
     }
     if (type === gl.FLOAT_VEC3) {
       return function (v) {
-        gl.uniform3fv(location, v);
+        gl.uniform3fv(location, v)
       }
     }
     if (type === gl.FLOAT_VEC4) {
       return function (v) {
-        gl.uniform4fv(location, v);
+        gl.uniform4fv(location, v)
       }
     }
     if (type === gl.INT && isArray) {
       return function (v) {
-        gl.uniform1iv(location, v);
+        gl.uniform1iv(location, v)
       }
     }
     if (type === gl.INT) {
       return function (v) {
-        gl.uniform1i(location, v);
+        gl.uniform1i(location, v)
       }
     }
     if (type === gl.INT_VEC2) {
       return function (v) {
-        gl.uniform2iv(location, v);
+        gl.uniform2iv(location, v)
       }
     }
     if (type === gl.INT_VEC3) {
       return function (v) {
-        gl.uniform3iv(location, v);
+        gl.uniform3iv(location, v)
       }
     }
     if (type === gl.INT_VEC4) {
       return function (v) {
-        gl.uniform4iv(location, v);
+        gl.uniform4iv(location, v)
       }
     }
     if (type === gl.BOOL) {
       return function (v) {
-        gl.uniform1iv(location, v);
+        gl.uniform1iv(location, v)
       }
     }
     if (type === gl.BOOL_VEC2) {
       return function (v) {
-        gl.uniform2iv(location, v);
+        gl.uniform2iv(location, v)
       }
     }
     if (type === gl.BOOL_VEC3) {
       return function (v) {
-        gl.uniform3iv(location, v);
+        gl.uniform3iv(location, v)
       }
     }
     if (type === gl.BOOL_VEC4) {
       return function (v) {
-        gl.uniform4iv(location, v);
+        gl.uniform4iv(location, v)
       }
     }
     if (type === gl.FLOAT_MAT2) {
       return function (v) {
-        gl.uniformMatrix2fv(location, false, v);
+        gl.uniformMatrix2fv(location, false, v)
       }
     }
     if (type === gl.FLOAT_MAT3) {
       return function (v) {
-        gl.uniformMatrix3fv(location, false, v);
+        gl.uniformMatrix3fv(location, false, v)
       }
     }
     if (type === gl.FLOAT_MAT4) {
       return function (v) {
-        gl.uniformMatrix4fv(location, false, v);
+        gl.uniformMatrix4fv(location, false, v)
       }
     }
     if ((type === gl.SAMPLER_2D || type === gl.SAMPLER_CUBE) && isArray) {
-      var units = [];
+      var units = []
       for (var ii = 0; ii < info.size; ++ii) {
-        units.push(textureUnit++);
+        units.push(textureUnit++)
       }
       return (function (bindPoint, units) {
         return function (textures) {
-          gl.uniform1iv(location, units);
+          gl.uniform1iv(location, units)
           textures.forEach(function (texture, index) {
-            gl.activeTexture(gl.TEXTURE0 + units[index]);
-            gl.bindTexture(bindPoint, texture);
-          });
+            gl.activeTexture(gl.TEXTURE0 + units[index])
+            gl.bindTexture(bindPoint, texture)
+          })
         }
       }(getBindPointForSamplerType(gl, type), units))
     }
     if (type === gl.SAMPLER_2D || type === gl.SAMPLER_CUBE) {
       return (function (bindPoint, unit) {
         return function (texture) {
-          gl.uniform1i(location, unit);
-          gl.activeTexture(gl.TEXTURE0 + unit);
-          gl.bindTexture(bindPoint, texture);
+          gl.uniform1i(location, unit)
+          gl.activeTexture(gl.TEXTURE0 + unit)
+          gl.bindTexture(bindPoint, texture)
         }
       }(getBindPointForSamplerType(gl, type), textureUnit++))
     }
     throw ('unknown type: 0x' + type.toString(16)) // we should never get here.
   }
 
-  var uniformSetters = { };
-  var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+  var uniformSetters = { }
+  var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS)
 
   for (var ii = 0; ii < numUniforms; ++ii) {
-    var uniformInfo = gl.getActiveUniform(program, ii);
+    var uniformInfo = gl.getActiveUniform(program, ii)
     if (!uniformInfo) {
       break
     }
-    var name = uniformInfo.name;
+    var name = uniformInfo.name
     // remove the array suffix.
     if (name.substr(-3) === '[0]') {
-      name = name.substr(0, name.length - 3);
+      name = name.substr(0, name.length - 3)
     }
-    var setter = createUniformSetter(program, uniformInfo);
-    uniformSetters[name] = setter;
+    var setter = createUniformSetter(program, uniformInfo)
+    uniformSetters[name] = setter
   }
   return uniformSetters
 }
@@ -508,13 +508,13 @@ function createUniformSetters (gl, program) {
  * @memberOf module:webgl-utils
  */
 function setUniforms (setters, values) {
-  setters = setters.uniformSetters || setters;
+  setters = setters.uniformSetters || setters
   Object.keys(values).forEach(function (name) {
-    var setter = setters[name];
+    var setter = setters[name]
     if (setter) {
-      setter(values[name]);
+      setter(values[name])
     }
-  });
+  })
 }
 
 /**
@@ -528,25 +528,25 @@ function setUniforms (setters, values) {
  */
 function createAttributeSetters (gl, program) {
   var attribSetters = {
-  };
+  }
 
   function createAttribSetter (index) {
     return function (b) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, b.buffer);
-      gl.enableVertexAttribArray(index);
+      gl.bindBuffer(gl.ARRAY_BUFFER, b.buffer)
+      gl.enableVertexAttribArray(index)
       gl.vertexAttribPointer(
-            index, b.numComponents || b.size, b.type || gl.FLOAT, b.normalize || false, b.stride || 0, b.offset || 0);
+            index, b.numComponents || b.size, b.type || gl.FLOAT, b.normalize || false, b.stride || 0, b.offset || 0)
     }
   }
 
-  var numAttribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+  var numAttribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES)
   for (var ii = 0; ii < numAttribs; ++ii) {
-    var attribInfo = gl.getActiveAttrib(program, ii);
+    var attribInfo = gl.getActiveAttrib(program, ii)
     if (!attribInfo) {
       break
     }
-    var index = gl.getAttribLocation(program, attribInfo.name);
-    attribSetters[attribInfo.name] = createAttribSetter(index);
+    var index = gl.getAttribLocation(program, attribInfo.name)
+    attribSetters[attribInfo.name] = createAttribSetter(index)
   }
 
   return attribSetters
@@ -606,13 +606,13 @@ function createAttributeSetters (gl, program) {
  * @deprecated use {@link module:webgl-utils.setBuffersAndAttributes}
  */
 function setAttributes (setters, attribs) {
-  setters = setters.attribSetters || setters;
+  setters = setters.attribSetters || setters
   Object.keys(attribs).forEach(function (name) {
-    var setter = setters[name];
+    var setter = setters[name]
     if (setter) {
-      setter(attribs[name]);
+      setter(attribs[name])
     }
-  });
+  })
 }
 
 /**
@@ -626,15 +626,15 @@ function setAttributes (setters, attribs) {
  * @param {WebGLBuffer} [indices] an optional ELEMENT_ARRAY_BUFFER of indices
  */
 function createVAOAndSetAttributes (gl, setters, attribs, indices) {
-  var vao = gl.createVertexArray();
-  gl.bindVertexArray(vao);
-  setAttributes(setters, attribs);
+  var vao = gl.createVertexArray()
+  gl.bindVertexArray(vao)
+  setAttributes(setters, attribs)
   if (indices) {
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indices);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indices)
   }
   // We unbind this because otherwise any change to ELEMENT_ARRAY_BUFFER
   // like when creating buffers for other stuff will mess up this VAO's binding
-  gl.bindVertexArray(null);
+  gl.bindVertexArray(null)
   return vao
 }
 
@@ -686,15 +686,15 @@ function createVAOFromBufferInfo (gl, programInfo, bufferInfo) {
 function createProgramInfo (
     gl, shaderSources, opt_attribs, opt_locations, opt_errorCallback) {
   shaderSources = shaderSources.map(function (source) {
-    var script = document.getElementById(source);
+    var script = document.getElementById(source)
     return script ? script.text : source
-  });
-  var program = webglUtils.createProgramFromSources(gl, shaderSources, opt_attribs, opt_locations, opt_errorCallback);
+  })
+  var program = webglUtils.createProgramFromSources(gl, shaderSources, opt_attribs, opt_locations, opt_errorCallback)
   if (!program) {
     return null
   }
-  var uniformSetters = createUniformSetters(gl, program);
-  var attribSetters = createAttributeSetters(gl, program);
+  var uniformSetters = createUniformSetters(gl, program)
+  var attribSetters = createAttributeSetters(gl, program)
   return {
     program: program,
     uniformSetters: uniformSetters,
@@ -739,9 +739,9 @@ function createProgramInfo (
  * @memberOf module:webgl-utils
  */
 function setBuffersAndAttributes (gl, setters, buffers) {
-  setAttributes(setters, buffers.attribs);
+  setAttributes(setters, buffers.attribs)
   if (buffers.indices) {
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices)
   }
 }
 
@@ -751,7 +751,7 @@ var browserPrefixes = [
   'MOZ_',
   'OP_',
   'WEBKIT_'
-];
+]
 
 /**
  * Given an extension name like WEBGL_compressed_texture_s3tc
@@ -764,8 +764,8 @@ var browserPrefixes = [
  */
 function getExtensionWithKnownPrefixes (gl, name) {
   for (var ii = 0; ii < browserPrefixes.length; ++ii) {
-    var prefixedName = browserPrefixes[ii] + name;
-    var ext = gl.getExtension(prefixedName);
+    var prefixedName = browserPrefixes[ii] + name
+    var ext = gl.getExtension(prefixedName)
     if (ext) {
       return ext
     }
@@ -782,12 +782,12 @@ function getExtensionWithKnownPrefixes (gl, name) {
  * @memberOf module:webgl-utils
  */
 function resizeCanvasToDisplaySize (canvas, multiplier) {
-  multiplier = multiplier || 1;
-  var width = canvas.clientWidth * multiplier | 0;
-  var height = canvas.clientHeight * multiplier | 0;
+  multiplier = multiplier || 1
+  var width = canvas.clientWidth * multiplier | 0
+  var height = canvas.clientHeight * multiplier | 0
   if (canvas.width !== width || canvas.height !== height) {
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = width
+    canvas.height = height
     return true
   }
   return false
@@ -797,28 +797,28 @@ function resizeCanvasToDisplaySize (canvas, multiplier) {
 // and allows use to `push` values into the array so we
 // don't have to manually compute offsets
 function augmentTypedArray (typedArray, numComponents) {
-  var cursor = 0;
+  var cursor = 0
   typedArray.push = function () {
     for (var ii = 0; ii < arguments.length; ++ii) {
-      var value = arguments[ii];
+      var value = arguments[ii]
       if (value instanceof Array || (value.buffer && value.buffer instanceof ArrayBuffer)) {
         for (var jj = 0; jj < value.length; ++jj) {
-          typedArray[cursor++] = value[jj];
+          typedArray[cursor++] = value[jj]
         }
       } else {
-        typedArray[cursor++] = value;
+        typedArray[cursor++] = value
       }
     }
-  };
+  }
   typedArray.reset = function (opt_index) {
-    cursor = opt_index || 0;
-  };
-  typedArray.numComponents = numComponents;
+    cursor = opt_index || 0
+  }
+  typedArray.numComponents = numComponents
   Object.defineProperty(typedArray, 'numElements', {
     get: function () {
       return this.length / this.numComponents | 0
     }
-  });
+  })
   return typedArray
 }
 
@@ -845,15 +845,15 @@ function augmentTypedArray (typedArray, numComponents) {
  * @memberOf module:webgl-utils
  */
 function createAugmentedTypedArray (numComponents, numElements, opt_type) {
-  var Type = opt_type || Float32Array;
+  var Type = opt_type || Float32Array
   return augmentTypedArray(new Type(numComponents * numElements), numComponents)
 }
 
 function createBufferFromTypedArray (gl, array, type, drawType) {
-  type = type || gl.ARRAY_BUFFER;
-  var buffer = gl.createBuffer();
-  gl.bindBuffer(type, buffer);
-  gl.bufferData(type, array, drawType || gl.STATIC_DRAW);
+  type = type || gl.ARRAY_BUFFER
+  var buffer = gl.createBuffer()
+  gl.bindBuffer(type, buffer)
+  gl.bufferData(type, array, drawType || gl.STATIC_DRAW)
   return buffer
 }
 
@@ -862,10 +862,10 @@ function allButIndices (name) {
 }
 
 function createMapping (obj) {
-  var mapping = {};
+  var mapping = {}
   Object.keys(obj).filter(allButIndices).forEach(function (key) {
-    mapping['a_' + key] = key;
-  });
+    mapping['a_' + key] = key
+  })
   return mapping
 }
 
@@ -893,13 +893,13 @@ function isArrayBuffer (a) {
 }
 
 function guessNumComponentsFromName (name, length) {
-  var numComponents;
+  var numComponents
   if (name.indexOf('coord') >= 0) {
-    numComponents = 2;
+    numComponents = 2
   } else if (name.indexOf('color') >= 0) {
-    numComponents = 4;
+    numComponents = 4
   } else {
-    numComponents = 3;  // position, normals, indices ...
+    numComponents = 3  // position, normals, indices ...
   }
 
   if (length % numComponents > 0) {
@@ -917,21 +917,21 @@ function makeTypedArray (array, name) {
   if (Array.isArray(array)) {
     array = {
       data: array
-    };
+    }
   }
 
   if (!array.numComponents) {
-    array.numComponents = guessNumComponentsFromName(name, array.length);
+    array.numComponents = guessNumComponentsFromName(name, array.length)
   }
 
-  var type = array.type;
+  var type = array.type
   if (!type) {
     if (name === 'indices') {
-      type = Uint16Array;
+      type = Uint16Array
     }
   }
-  var typedArray = createAugmentedTypedArray(array.numComponents, array.data.length / array.numComponents | 0, type);
-  typedArray.push(array.data);
+  var typedArray = createAugmentedTypedArray(array.numComponents, array.data.length / array.numComponents | 0, type)
+  typedArray.push(array.data)
   return typedArray
 }
 
@@ -977,18 +977,18 @@ function makeTypedArray (array, name) {
  * @memberOf module:webgl-utils
  */
 function createAttribsFromArrays (gl, arrays, opt_mapping) {
-  var mapping = opt_mapping || createMapping(arrays);
-  var attribs = {};
+  var mapping = opt_mapping || createMapping(arrays)
+  var attribs = {}
   Object.keys(mapping).forEach(function (attribName) {
-    var bufferName = mapping[attribName];
-    var array = makeTypedArray(arrays[bufferName], bufferName);
+    var bufferName = mapping[attribName]
+    var array = makeTypedArray(arrays[bufferName], bufferName)
     attribs[attribName] = {
       buffer: createBufferFromTypedArray(gl, array),
       numComponents: array.numComponents || guessNumComponentsFromName(bufferName),
       type: getGLTypeForTypedArray(gl, array),
       normalize: getNormalizationForTypedArray(array)
-    };
-  });
+    }
+  })
   return attribs
 }
 
@@ -996,8 +996,8 @@ function createAttribsFromArrays (gl, arrays, opt_mapping) {
  * tries to get the number of elements from a set of arrays.
  */
 function getNumElementsFromNonIndexedArrays (arrays) {
-  var key = Object.keys(arrays)[0];
-  var array = arrays[key];
+  var key = Object.keys(arrays)[0]
+  var array = arrays[key]
   if (isArrayBuffer(array)) {
     return array.numElements
   } else {
@@ -1137,14 +1137,14 @@ function getNumElementsFromNonIndexedArrays (arrays) {
 function createBufferInfoFromArrays (gl, arrays, opt_mapping) {
   var bufferInfo = {
     attribs: createAttribsFromArrays(gl, arrays, opt_mapping)
-  };
-  var indices = arrays.indices;
+  }
+  var indices = arrays.indices
   if (indices) {
-    indices = makeTypedArray(indices, 'indices');
-    bufferInfo.indices = createBufferFromTypedArray(gl, indices, gl.ELEMENT_ARRAY_BUFFER);
-    bufferInfo.numElements = indices.length;
+    indices = makeTypedArray(indices, 'indices')
+    bufferInfo.indices = createBufferFromTypedArray(gl, indices, gl.ELEMENT_ARRAY_BUFFER)
+    bufferInfo.numElements = indices.length
   } else {
-    bufferInfo.numElements = getNumElementsFromNonIndexedArrays(arrays);
+    bufferInfo.numElements = getNumElementsFromNonIndexedArrays(arrays)
   }
 
   return bufferInfo
@@ -1175,18 +1175,18 @@ function createBufferInfoFromArrays (gl, arrays, opt_mapping) {
  * @memberOf module:webgl-utils
  */
 function createBuffersFromArrays (gl, arrays) {
-  var buffers = { };
+  var buffers = { }
   Object.keys(arrays).forEach(function (key) {
-    var type = key === 'indices' ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER;
-    var array = makeTypedArray(arrays[key], name);
-    buffers[key] = createBufferFromTypedArray(gl, array, type);
-  });
+    var type = key === 'indices' ? gl.ELEMENT_ARRAY_BUFFER : gl.ARRAY_BUFFER
+    var array = makeTypedArray(arrays[key], name)
+    buffers[key] = createBufferFromTypedArray(gl, array, type)
+  })
 
   // hrm
   if (arrays.indices) {
-    buffers.numElements = arrays.indices.length;
+    buffers.numElements = arrays.indices.length
   } else if (arrays.position) {
-    buffers.numElements = arrays.position.length / 3;
+    buffers.numElements = arrays.position.length / 3
   }
 
   return buffers
@@ -1207,14 +1207,14 @@ function createBuffersFromArrays (gl, arrays) {
  * @memberOf module:webgl-utils
  */
 function drawBufferInfo (gl, bufferInfo, primitiveType, count, offset) {
-  var indices = bufferInfo.indices;
-  primitiveType = primitiveType === undefined ? gl.TRIANGLES : primitiveType;
-  var numElements = count === undefined ? bufferInfo.numElements : count;
-  offset = offset === undefined ? offset : 0;
+  var indices = bufferInfo.indices
+  primitiveType = primitiveType === undefined ? gl.TRIANGLES : primitiveType
+  var numElements = count === undefined ? bufferInfo.numElements : count
+  offset = offset === undefined ? offset : 0
   if (indices) {
-    gl.drawElements(primitiveType, numElements, gl.UNSIGNED_SHORT, offset);
+    gl.drawElements(primitiveType, numElements, gl.UNSIGNED_SHORT, offset)
   } else {
-    gl.drawArrays(primitiveType, offset, numElements);
+    gl.drawArrays(primitiveType, offset, numElements)
   }
 }
 
@@ -1233,55 +1233,55 @@ function drawBufferInfo (gl, bufferInfo, primitiveType, count, offset) {
  * @memberOf module:webgl-utils
  */
 function drawObjectList (gl, objectsToDraw) {
-  var lastUsedProgramInfo = null;
-  var lastUsedBufferInfo = null;
+  var lastUsedProgramInfo = null
+  var lastUsedBufferInfo = null
 
   objectsToDraw.forEach(function (object) {
-    var programInfo = object.programInfo;
-    var bufferInfo = object.bufferInfo;
-    var bindBuffers = false;
+    var programInfo = object.programInfo
+    var bufferInfo = object.bufferInfo
+    var bindBuffers = false
 
     if (programInfo !== lastUsedProgramInfo) {
-      lastUsedProgramInfo = programInfo;
-      gl.useProgram(programInfo.program);
-      bindBuffers = true;
+      lastUsedProgramInfo = programInfo
+      gl.useProgram(programInfo.program)
+      bindBuffers = true
     }
 
     // Setup all the needed attributes.
     if (bindBuffers || bufferInfo !== lastUsedBufferInfo) {
-      lastUsedBufferInfo = bufferInfo;
-      setBuffersAndAttributes(gl, programInfo.attribSetters, bufferInfo);
+      lastUsedBufferInfo = bufferInfo
+      setBuffersAndAttributes(gl, programInfo.attribSetters, bufferInfo)
     }
 
     // Set the uniforms.
-    setUniforms(programInfo.uniformSetters, object.uniforms);
+    setUniforms(programInfo.uniformSetters, object.uniforms)
 
     // Draw
-    drawBufferInfo(gl, bufferInfo);
-  });
+    drawBufferInfo(gl, bufferInfo)
+  })
 }
 
-var isIE = /* @cc_on!@ */false || !!document.documentMode;
+var isIE = /* @cc_on!@ */false || !!document.documentMode
 // Edge 20+
-var isEdge = !isIE && !!window.StyleMedia;
+var isEdge = !isIE && !!window.StyleMedia
 if (isEdge) {
   // Hack for Edge. Edge's WebGL implmentation is crap still and so they
   // only respond to "experimental-webgl". I don't want to clutter the
   // examples with that so his hack works around it
   HTMLCanvasElement.prototype.getContext = (function (origFn) {
     return function () {
-      var args = arguments;
-      var type = args[0];
+      var args = arguments
+      var type = args[0]
       if (type === 'webgl') {
-        args = [].slice.call(arguments);
-        args[0] = 'experimental-webgl';
+        args = [].slice.call(arguments)
+        args[0] = 'experimental-webgl'
       }
       return origFn.apply(this, args)
     }
-  }(HTMLCanvasElement.prototype.getContext));
+  }(HTMLCanvasElement.prototype.getContext))
 }
 
-var webglUtils$1 = {
+export default {
   createAugmentedTypedArray,
   createAttribsFromArrays,
   createBuffersFromArrays,
@@ -1327,304 +1327,3 @@ var webglUtils$1 = {
 //   setUniforms: setUniforms,
 //   createProgramFromObjects: createProgramFromObjects // addition to default
 // }
-
-const verifyUniforms = uniforms => {
-  for (let uniform in uniforms) {
-    if (typeof +uniforms[uniform] !== 'number') {
-      throw new TypeError(`${uniform} must be a Number`)
-    }
-  }
-};
-// TODO: this function must be improved
-const validateConfig = config => {
-  if (!config) throw new Error('You should specify a config object')
-  if (config.canvas.nodeName !== 'CANVAS') throw new Error('config.canvas must be a Canvas element')
-  if (config.uniforms) verifyUniforms(config.uniforms);
-};
-
-// default vertex shader from WebGL Fundamentals
-var vertexShader = {
-  type: 'x-shader/x-vector',
-  text: `
-  attribute vec2 a_position;
-  attribute vec2 a_texCoord;
-  
-  uniform vec2 u_resolution;
-  
-  varying vec2 v_texCoord;
-  
-  void main() {
-     // convert the rectangle from pixels to 0.0 to 1.0
-     vec2 zeroToOne = a_position / u_resolution;
-  
-     // convert from 0->1 to 0->2
-     vec2 zeroToTwo = zeroToOne * 2.0;
-  
-     // convert from 0->2 to -1->+1 (clipspace)
-     vec2 clipSpace = zeroToTwo - 1.0;
-  
-     gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-  
-     // pass the texCoord to the fragment shader
-     // The GPU will interpolate this value between points.
-     v_texCoord = a_texCoord;
-  }
-  `
-}
-
-const FragmentShader = function(name, text, defaultUniforms) {
-    return {
-      name,
-      text,
-      defaultUniforms
-    }
-};
-
-FragmentShader.prototype.type = 'x-shader/x-fragment';
-
-// based on Agnius Vasiliauskas's original work
-// http://coding-experiments.blogspot.com.br/2010/06/pixelation.html
-var pixelationCode = `precision mediump float;
-
-uniform sampler2D u_image;  
-uniform vec2 u_textureSize;
-
-varying vec2 v_texCoord;
-uniform float pixel_h;
-uniform float pixel_w;
-
-void main() {
-  float dx = pixel_w*(1./u_textureSize.x);
-  float dy = pixel_h*(1./u_textureSize.y);
-  vec2 coord = vec2(dx*floor(v_texCoord.x/dx), dy*floor(v_texCoord.y/dy));
-  
-  gl_FragColor = texture2D(u_image, coord);
-}`
-
-// shader from WebGL Fundamentals
-// https://webglfundamentals.org/webgl/lessons/webgl-image-processing.html
-var convKernelCode = `precision mediump float;      
-// our texture
-uniform sampler2D u_image;
-uniform vec2 u_textureSize;
-uniform float u_kernel[9];
-uniform float u_kernelWeight;
-
-// the texCoords passed in from the vertex shader.
-varying vec2 v_texCoord;
-
-void main() {
-  vec2 onePixel = vec2(1.0, 1.0) / u_textureSize;
-  vec4 colorSum =
-    texture2D(u_image, v_texCoord + onePixel * vec2(-1, -1)) * u_kernel[0] +
-    texture2D(u_image, v_texCoord + onePixel * vec2( 0, -1)) * u_kernel[1] +
-    texture2D(u_image, v_texCoord + onePixel * vec2( 1, -1)) * u_kernel[2] +
-    texture2D(u_image, v_texCoord + onePixel * vec2(-1,  0)) * u_kernel[3] +
-    texture2D(u_image, v_texCoord + onePixel * vec2( 0,  0)) * u_kernel[4] +
-    texture2D(u_image, v_texCoord + onePixel * vec2( 1,  0)) * u_kernel[5] +
-    texture2D(u_image, v_texCoord + onePixel * vec2(-1,  1)) * u_kernel[6] +
-    texture2D(u_image, v_texCoord + onePixel * vec2( 0,  1)) * u_kernel[7] +
-    texture2D(u_image, v_texCoord + onePixel * vec2( 1,  1)) * u_kernel[8] ;
-
-  // Divide the sum by the weight but just use rgb
-  // we'll set alpha to 1.0
-  gl_FragColor = vec4((colorSum / u_kernelWeight).rgb, 1.0);
-}
-`
-
-var normalCode = `
-precision mediump float;
-
-// our texture
-uniform sampler2D u_image;
-
-// the texCoords passed in from the vertex shader.
-varying vec2 v_texCoord;
-
-void main() {
-  // Look up a color from the texture.
-  gl_FragColor = texture2D(u_image, v_texCoord);
-}
-`
-
-const normal = new FragmentShader('normal', normalCode, {});
-
-const pixelation = new FragmentShader('pixelation', pixelationCode, {
-  pixel_h: 5,
-  pixel_w: 5
-});
-
-const edgeDetect1 = new FragmentShader('edgeDetect1', convKernelCode, {
-  u_kernel: [
-    -5, 0, 0,
-    0, 0, 0,
-    0, 0, 5
-  ],
-  u_kernelWeight: 1
-});
-
-// here are the image processing fragment shaders
-const fragmentShaders = {
-  normal,
-  pixelation,
-  edgeDetect1
-};
-
-// modified from WebGl Fundamentals boilerplate to fit our needs
-// https://webglfundamentals.org/webgl/lessons/webgl-image-processing.html
-const render = (shaderName, config) => {
-  // some validation
-  validateConfig(config);
-  if (!fragmentShaders[shaderName]) throw new Error(shaderName + " is not defined in shaderfy's file 'core.js'")
-  if (!config.uniforms) config.uniforms = fragmentShaders[shaderName].defaultUniforms;
-
-  // Get A WebGL context
-  /** @type {HTMLCanvasElement} */
-  var canvas = config.canvas;
-  var image = config.image;
-  var fragShader = fragmentShaders[shaderName];
-
-  var gl = canvas.getContext('webgl');
-
-  if (config.fitCanvas) {
-    canvas.width = image.width;
-    canvas.height = image.height;
-  }
-
-  // important to be able to call toDataUrl() and save the image
-  gl.getContextAttributes().preserveDrawingBuffer = true;
-
-  if (!gl) {
-    return void window.alert('WebGL is not available on your machine')
-  }
-
-  // setup GLSL program
-  var program = webglUtils$1.createProgramFromObjects(gl, [vertexShader, fragShader]);
-
-  // look up where the vertex data needs to go.
-  var positionLocation = gl.getAttribLocation(program, 'a_position');
-  var texcoordLocation = gl.getAttribLocation(program, 'a_texCoord');
-
-  // Create a buffer to put three 2d clip space points in
-  var positionBuffer = gl.createBuffer();
-
-  // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  // Set a rectangle the same size as the image.
-  setRectangle(gl, 0, 0, image.width, image.height);
-
-  // provide texture coordinates for the rectangle.
-  var texcoordBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    0.0, 0.0,
-    1.0, 0.0,
-    0.0, 1.0,
-    0.0, 1.0,
-    1.0, 0.0,
-    1.0, 1.0
-  ]), gl.STATIC_DRAW);
-
-  // Create a texture.
-  var texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-
-  // Set the parameters so we can render any size image.
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-  // Upload the image into the texture.
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-
-  // lookup uniforms
-  var resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
-  var textureSizeLocation = gl.getUniformLocation(program, 'u_textureSize');
-
-  webglUtils$1.resizeCanvasToDisplaySize(gl.canvas);
-
-  // Tell WebGL how to convert from clip space to pixels
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-  // Clear the canvas
-  gl.clearColor(0, 0, 0, 0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-
-  // Tell it to use our program (pair of shaders)
-  gl.useProgram(program);
-
-  // Turn on the position attribute
-  gl.enableVertexAttribArray(positionLocation);
-
-  // Bind the position buffer.
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-  // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-  var size = 2;          // 2 components per iteration
-  var type = gl.FLOAT;   // the data is 32bit floats
-  var normalize = false; // don't normalize the data
-  var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-  var offset = 0;        // start at the beginning of the buffer
-  gl.vertexAttribPointer(positionLocation, size, type, normalize, stride, offset);
-
-  // Turn on the teccord attribute
-  gl.enableVertexAttribArray(texcoordLocation);
-
-  // Bind the position buffer.
-  gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
-
-  // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-  var size = 2;          // 2 components per iteration
-  var type = gl.FLOAT;   // the data is 32bit floats
-  var normalize = false; // don't normalize the data
-  var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-  var offset = 0;        // start at the beginning of the buffer
-  gl.vertexAttribPointer(
-      texcoordLocation, size, type, normalize, stride, offset);
-
-  // set the resolution
-  gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
-  // set the size of the image
-  gl.uniform2f(textureSizeLocation, image.width, image.height);
-
-  // always using float type for uniforms, maybe expand to test integer etc
-  for (var u in config.uniforms) {
-    if (config.uniforms[u].constructor === Array) {
-      gl.uniform1fv(gl.getUniformLocation(program, u + '[0]'), config.uniforms[u]);
-    } else {
-      gl.uniform1f(gl.getUniformLocation(program, u), config.uniforms[u]);
-    }
-  }
-
-  // Draw the rectangle.
-  var primitiveType = gl.TRIANGLES;
-  var offset = 0;
-  var count = 6;
-  gl.drawArrays(primitiveType, offset, count);
-};
-
-function setRectangle (gl, x, y, width, height) {
-  var x1 = x;
-  var x2 = x + width;
-  var y1 = y;
-  var y2 = y + height;
-
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    x1, y1,
-    x2, y1,
-    x1, y2,
-    x1, y2,
-    x2, y1,
-    x2, y2
-  ]), gl.STATIC_DRAW);
-}
-
-var shaderfy = {
-  render,
-  fragmentShaders
-}
-
-return shaderfy;
-
-}());
