@@ -1,7 +1,6 @@
 // default vertex shader from WebGL Fundamentals
-export default {
-  type: 'x-shader/x-vector',
-  text: `
+const VertexShader = function(text){
+  this.text = text || `
   attribute vec2 a_position;
   attribute vec2 a_texCoord;
   
@@ -27,3 +26,7 @@ export default {
   }
   `
 }
+
+VertexShader.prototype.text = 'x-shader/x-vector'
+
+export default VertexShader
