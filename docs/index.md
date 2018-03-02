@@ -1,1 +1,0 @@
-# shaderfy documentation [WIP]
