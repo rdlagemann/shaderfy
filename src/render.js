@@ -17,10 +17,7 @@ export const render = (fragShader, config, vertexShader) => {
   /** @type {HTMLCanvasElement} */
   var image = config.image
 
-  var gl = config.canvas.getContext('webgl')
-
-  console.log('canvas width', config.canvas)
-  
+  var gl = config.canvas.getContext('webgl')  
 
   if (config.fitToCanvas) {
     let w = image.width

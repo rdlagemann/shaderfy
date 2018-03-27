@@ -13,8 +13,11 @@
     
     let c = document.createElement('canvas')
     c.setAttribute('id', `canvas_${name}`)
+    // let p = document.createElement('p')
+    // p.innerHTML = `${name}`
     body.appendChild(c)
-
+    // c.parentNode.insertBefore(p, c.nextSibling)
+    
     let config = {stretchToCanvas: true}
     config.canvas = c
 

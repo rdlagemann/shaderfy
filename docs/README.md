@@ -5,7 +5,7 @@
 First, grab [shaderfy](https://raw.githubusercontent.com/rdlagemann/shaderfy/master/lib/shaderfy.js).
   
 Load it through HTML:
-```
+```html
 <body>
 	...
 	<script src="path/to/file/shaderfy.js"></script>

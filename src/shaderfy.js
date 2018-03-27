@@ -16,11 +16,11 @@ const filters = {
     pixel_w: 5
   }, pixelationCode),
   
-  edgeDetect1: new ConvolutionKernelShader('edgeDetect1', {
+  edgeDetect: new ConvolutionKernelShader('edgeDetect', {
     u_kernel: [
-      -5, 0, 0,
-      0, 0, 0,
-      0, 0, 5
+      -0.125, -0.125, -0.125,
+      -0.125,  1,     -0.125,
+      -0.125, -0.125, -0.125
     ]
   }),
   
@@ -29,6 +29,38 @@ const filters = {
       -1, -1, -1,
       -1,  8, -1,
       -1, -1, -1
+    ]
+  }),
+
+  edgeDetect3: new ConvolutionKernelShader('edgeDetect2', {
+    u_kernel: [
+      -5, 0, 0,
+      0, 0, 0,
+      0, 0, 5
+    ]
+  }),
+
+  edgeDetect4: new ConvolutionKernelShader('edgeDetect2', {
+    u_kernel: [
+      -1, -1, -1,
+      0,  0,  0,
+      1,  1,  1
+    ]
+  }),
+
+  edgeDetect5: new ConvolutionKernelShader('edgeDetect2', {
+    u_kernel: [
+      -1, -1, -1,
+      2,  2,  2,
+      -1, -1, -1
+    ]
+  }),
+
+  edgeDetect6: new ConvolutionKernelShader('edgeDetect2', {
+    u_kernel: [
+      -5, -5, -5,
+      -5, 39, -5,
+      -5, -5, -5
     ]
   }),
 
@@ -70,53 +102,17 @@ const filters = {
       -1, 5, -1,
       0, -1, 0
     ]
-  })
+  }),
 
-  //   unsharpen: [
-  //     -1, -1, -1,
-  //     -1,  9, -1,
-  //     -1, -1, -1
-  //   ],
-  //   sharpness: [
-  //      0,-1, 0,
-  //     -1, 5,-1,
-  //      0,-1, 0
-  //   ],
-  //   sharpen: [
-  //      -1, -1, -1,
-  //      -1, 16, -1,
-  //      -1, -1, -1
-  //   ],
-  //   edgeDetect: [
-  //      -0.125, -0.125, -0.125,
-  //      -0.125,  1,     -0.125,
-  //      -0.125, -0.125, -0.125
-  //   ],
-  //   edgeDetect2: [
-  //      -1, -1, -1,
-  //      -1,  8, -1,
-  //      -1, -1, -1
-  //   ],
-  //   edgeDetect3: [
-  //      -5, 0, 0,
-  //       0, 0, 0,
-  //       0, 0, 5
-  //   ],
-  //   edgeDetect4: [
-  //      -1, -1, -1,
-  //       0,  0,  0,
-  //       1,  1,  1
-  //   ],
-  //   edgeDetect5: [
-  //      -1, -1, -1,
-  //       2,  2,  2,
-  //      -1, -1, -1
-  //   ],
-  //   edgeDetect6: [
-  //      -5, -5, -5,
-  //      -5, 39, -5,
-  //      -5, -5, -5
-  //   ],
+  sharpen: new ConvolutionKernelShader('sharpen', {
+    u_kernel: [
+      -1, -1, -1,
+      -1, 16, -1,
+      -1, -1, -1
+    ]
+  }),
+
+ 
   //   sobelHorizontal: [
       //   1,  2,  1,
       //   0,  0,  0,
